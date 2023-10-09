@@ -1,0 +1,13 @@
+name: Run tests
+
+on: [push, pull_request]
+
+jobs:  
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x, 13.x]
+        mongodb-version: [4.0, 4.2]
+
+    name: Node.js ${{ matrix.node-version }} - MongoDB ${{ matrix.mongodb-version }}
