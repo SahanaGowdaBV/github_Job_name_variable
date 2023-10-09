@@ -25,7 +25,7 @@ jobs:
       - name: run yq
         id: test
         run: |
-          YQ=$(yq -r '.environments.' test.yaml)
+          YQ=$(yq eval '.environments | keys[]' test.yaml)
           echo "YQ: $YQ"
           echo "YQ=$YQ" | tee -a >> $GITHUB_OUTPUT
 
