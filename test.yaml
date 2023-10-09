@@ -1,0 +1,37 @@
+build:
+  image: test
+
+environments:
+  dev:
+    branch: test
+    cluster: test
+    promotion:
+      to: prod-2
+      mergeTo: master 
+    env:
+      - name: NODE_ENV_ARG
+        value: production
+    ingressDomains:
+      - helloworld-dev1.tfcom-cluster-na-techopsdev.clouddev.thermofisher.net
+  dev-cn:
+    branch: release/.*
+    cluster: tfcom-cluster-na-techopsdev.clouddev.thermofisher.net
+    env:
+      - name: NODE_ENV_ARG
+        value: production
+    ingressDomains:
+      - helloworld-dev1.tfcom-cluster-na-techopsdev.clouddev.thermofisher.net
+    promotion:
+      to: prod-1
+      mergeTo: master  
+  test:
+    branch: release/.*
+    cluster: tfcom-cluster-na-techopsdev.clouddev.thermofisher.net
+    env:
+      - name: NODE_ENV_ARG
+        value: production
+    ingressDomains:
+      - helloworld-dev1.tfcom-cluster-na-techopsdev.clouddev.thermofisher.net
+    promotion:
+      to: prod-1
+      mergeTo: master  
