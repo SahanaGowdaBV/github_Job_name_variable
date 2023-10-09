@@ -5,12 +5,28 @@ on: [push, pull_request]
 jobs:  
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.x, 13.x]
-        mongodb-version: [4.0, 4.2]
+    # env:
+    #   test: ${{ steps.metrics.outputs.branchesCovered }}
+    # strategy:
+    #   matrix:
+    #     node-version: [12.x, 13.x]
+    #     mongodb-version: [4.0, 4.2]
     steps:
       - name: checkout
         uses: actions/checkout@v3
 
-    name: yq -r '.environments' test.yaml
+      - name: Setup yq
+        run: |
+          echo "Download yq"
+          curl -v -L "https://github.com/mikefarah/yq/releases/download/v4.25.3/yq_linux_amd64.tar.gz" -o "yq_linux_amd64.tar.gz"
+          tar -xvf yq_linux_amd64.tar.gz
+          mv yq_linux_amd64 yq
+
+      - name: run yq
+        id: test
+        run: |
+          YQ=$(yq -r '.environments' test.yaml)
+          echo "YQ: $YQ"
+          echo "YQ=$YQ" | tee -a >> $GITHUB_OUTPUT
+
+    name: $YQ
