@@ -1,0 +1,13 @@
+name: test
+runs:
+  using: "composite"
+  steps:
+  - name: step1
+    if: contains(github.job, 'build')
+    run: |
+      echo "printing build job"
+    
+  - name: step2
+    if: contains(github.job, 'deploy')
+    run: |
+      echo "printing deplo job"
