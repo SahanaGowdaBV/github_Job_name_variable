@@ -12,7 +12,7 @@ jobs:
         uses: SahanaGowdaBV/github_Job_name_variable/.github/actions/pass@main
 
   deploy:
-    if: ${{ github.ref, 'refs/heads/hotfix-bug' || github.head_ref, 'refs/heads/hotfix-bug' }}
+    if: ${{ (github.ref, 'refs/heads/hotfix-bug') || (github.head_ref, 'refs/heads/hotfix-bug') }}
     runs-on: ubuntu-latest
     steps:
       - name: Run step2
