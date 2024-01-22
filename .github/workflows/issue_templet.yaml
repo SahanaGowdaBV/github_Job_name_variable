@@ -16,37 +16,41 @@ jobs:
         #   ref: ${{ github.head_ref }}
         #   # full git history is needed to get a proper list of changed files.
         #   fetch-depth: 0
+        
+      - name: Extract issue details
+        run: |
+          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${{ github.event.issue.body }}")
 
-      # Setup python
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
+          echo "Process Name: $process_name"
+          echo "Process Version: $process_version"
+          echo "Change Reason: $change_reason"
 
       # - name: Check issue title
       #   if: ${{ github.event.issue.title == 'Issue: Production package move request' }}
       #   run: echo "Issue title matches"
 
-      - name: Extract issue details
-        # if: ${{ github.event.issue.title == 'Issue: Production package move request' }}
-        run: |
-          echo "process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
-          echo "process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
-          echo "change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
+      # - name: Extract issue details
+      #   # if: ${{ github.event.issue.title == 'Issue: Production package move request' }}
+      #   run: |
+      #     echo "process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
+      #     echo "process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
+      #     echo "change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
 
-      - name: Download & upload package
-        shell: bash
-        run: |
-          echo "PROCESS_NAME: $PROCESS_NAME"
-          echo "PROCESS_VERSION: $PROCESS_VERSION"
-          echo "CHANGE_REASON: $CHANGE_REASON"
-          # pip3 install requests
-          # python upload-download-package.py "${{ inputs.package-and-version }}"
-        env:
-          # DEV_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }} 
-          # DEV_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }} 
-          # TEST_CLIENT_ID: ${{ secrets.TEST_CLIENT_ID }} 
-          # TEST_CLIENT_SECRET: ${{ secrets.TEST_CLIENT_SECRET }}
-          PROCESS_NAME: ${{ env.process_name }}
-          PROCESS_VERSION: ${{ env.process_version }}
-          CHANGE_REASON: ${{ env.change_reason }}
+      # - name: Download & upload package
+      #   shell: bash
+      #   run: |
+      #     echo "PROCESS_NAME: $PROCESS_NAME"
+      #     echo "PROCESS_VERSION: $PROCESS_VERSION"
+      #     echo "CHANGE_REASON: $CHANGE_REASON"
+      #     # pip3 install requests
+      #     # python upload-download-package.py "${{ inputs.package-and-version }}"
+      #   env:
+      #     # DEV_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }} 
+      #     # DEV_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }} 
+      #     # TEST_CLIENT_ID: ${{ secrets.TEST_CLIENT_ID }} 
+      #     # TEST_CLIENT_SECRET: ${{ secrets.TEST_CLIENT_SECRET }}
+      #     PROCESS_NAME: ${{ env.process_name }}
+      #     PROCESS_VERSION: ${{ env.process_version }}
+      #     CHANGE_REASON: ${{ env.change_reason }}
