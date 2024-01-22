@@ -20,20 +20,20 @@ jobs:
       - name: Extract issue details
         shell: bash
         run: |
-          # Extract values from YAML content using yq
-          process_name=$(echo "${{ github.event.issue.body }}" | yq eval '.process_name' -)
-          process_version=$(echo "${{ github.event.issue.body }}" | yq eval '.process_version' -)
-          change_reason=$(echo "${{ github.event.issue.body }}" | yq eval '.change_reason' -)
+          # # Extract values from YAML content using yq
+          # process_name=$(echo "${{ github.event.issue.body }}" | yq eval '.process_name' -)
+          # process_version=$(echo "${{ github.event.issue.body }}" | yq eval '.process_version' -)
+          # change_reason=$(echo "${{ github.event.issue.body }}" | yq eval '.change_reason' -)
           
-          # Output the extracted values
-          echo "process_name: $process_name"
-          echo "process_version: $process_version"
-          echo "change_reason: $change_reason"
+          # # Output the extracted values
+          # echo "process_name: $process_name"
+          # echo "process_version: $process_version"
+          # echo "change_reason: $change_reason"
 
 
-          # process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          # process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          # change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${{ github.event.issue.body }}")
           echo "Process Name: $process_name"
           echo "Process Version: $process_version"
           echo "Change Reason: $change_reason"
