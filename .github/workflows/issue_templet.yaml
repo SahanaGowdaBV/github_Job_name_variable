@@ -21,12 +21,12 @@ jobs:
         shell: bash
         run: |
           # Extract the YAML portion of the issue body
-          yaml_content=$(awk '/```yaml/{flag=1; next} /```/{flag=0} flag' <<< "${{ github.event.issue.body }}")
+          yaml_content=$(sed -n '/```yaml/,/```/p' <<< "${{ github.event.issue.body }}" | sed '1d;$d')
           
-          # Extract values from the YAML content using Python
-          process_name=$(python -c "import yaml, sys; print(yaml.safe_load(sys.stdin)['process_name']" <<< "${yaml_content}")
-          process_version=$(python -c "import yaml, sys; print(yaml.safe_load(sys.stdin)['process_version']" <<< "${yaml_content}")
-          change_reason=$(python -c "import yaml, sys; print(yaml.safe_load(sys.stdin)['change_reason']" <<< "${yaml_content}")
+          # Extract values from the YAML content using jq
+          process_name=$(echo "${yaml_content}" | jq -r '.process_name')
+          process_version=$(echo "${yaml_content}" | jq -r '.process_version')
+          change_reason=$(echo "${yaml_content}" | jq -r '.change_reason')
 
           echo "Process Name: $process_name"
           echo "Process Version: $process_version"
