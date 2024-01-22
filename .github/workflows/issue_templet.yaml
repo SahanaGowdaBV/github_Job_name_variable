@@ -21,14 +21,15 @@ jobs:
         shell: bash
         run: |
           # Extract the YAML portion of the issue body
-          yaml_content=$(sed -n '/```yaml/,/```/p' <<< "${{ github.event.issue.body }}" | sed '1d;$d')
+          yaml_content=$(sed -n '/```yaml/,/```/p' <<< "${{ github.event.issue.body }}")
+          
+          # Remove the opening and closing ```yaml
+          yaml_content=$(sed '1d;$d' <<< "${yaml_content}")
           
           # Extract values from the YAML content
           process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${yaml_content}")
           process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${yaml_content}")
           change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${yaml_content}")
-
-
 
           echo "Process Name: $process_name"
           echo "Process Version: $process_version"
