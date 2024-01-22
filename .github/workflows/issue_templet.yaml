@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           # Extract the YAML portion of the issue body
-          yaml_content=$(sed -n '/```yaml/,/```/p' <<< "${{ github.event.issue.body }}" | sed '1d;$d')
+          yaml_content=$(awk '/```yaml/{flag=1; next}/```/{flag=0}flag' <<< "${{ github.event.issue.body }}")
           
           # Extract values from the YAML content using jq
           process_name=$(echo "${yaml_content}" | jq -r '.process_name')
