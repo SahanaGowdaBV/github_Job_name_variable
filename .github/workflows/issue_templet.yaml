@@ -30,9 +30,9 @@ jobs:
       - name: Extract issue details
         # if: ${{ github.event.issue.title == 'Issue: Production package move request' }}
         run: |
-          echo "process_name=$(grep 'process_name:' <<< ${{ github.event.issue.body }} | awk '{print $2}')" >> $GITHUB_ENV
-          echo "process_version=$(grep 'process_version:' <<< ${{ github.event.issue.body }} | awk '{print $2}')" >> $GITHUB_ENV
-          echo "change_reason=$(grep 'change_reason:' <<< ${{ github.event.issue.body }} | awk '{print $2}')" >> $GITHUB_ENV
+          echo "process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
+          echo "process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
+          echo "change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< ${{ github.event.issue.body }})" >> $GITHUB_ENV
 
       - name: Download & upload package
         shell: bash
