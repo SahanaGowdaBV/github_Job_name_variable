@@ -21,9 +21,9 @@ jobs:
         shell: bash
         run: |
           # Extract values from YAML content using yq
-          process_name=$(echo "${{ github.event.issue.body }}" | yq e '.process_name' -)
-          process_version=$(echo "${{ github.event.issue.body }}" | yq e '.process_version' -)
-          change_reason=$(echo "${{ github.event.issue.body }}" | yq e '.change_reason' -)
+          process_name=$(echo "${{ github.event.issue.body }}" | yq e '.process_name' // []' -)
+          process_version=$(echo "${{ github.event.issue.body }}" | yq e '.process_version' // []' -)
+          change_reason=$(echo "${{ github.event.issue.body }}" | yq e '.change_reason' // []' -)
           
           # Output the extracted values
           echo "process_name: $process_name"
