@@ -20,9 +20,14 @@ jobs:
       - name: Extract issue details
         shell: bash
         run: |
-          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          # Extract the YAML portion of the issue body
+          yaml_content=$(sed -n '/```yaml/,/```/p' <<< "${{ github.event.issue.body }}" | sed '1d;$d')
+          
+          # Extract values from the YAML content
+          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${yaml_content}")
+          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${yaml_content}")
+          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${yaml_content}")
+
 
 
           echo "Process Name: $process_name"
