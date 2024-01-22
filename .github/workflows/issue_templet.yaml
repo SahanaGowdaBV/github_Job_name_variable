@@ -22,7 +22,8 @@ jobs:
         run: |
           # Extract the YAML portion of the issue body
           echo "extract yaml"
-          yaml_content=$(awk '/```yaml/{flag=1; next} /```/{flag=0} flag' <<< "${{ github.event.issue.body }}")
+          yaml_content=$(sed -n '/```yaml/,/```/p' <<< "${{ github.event.issue.body }}" | sed '1d;$d')
+
           
           echo "print yaml value"
           # Extract values from the YAML content using awk
