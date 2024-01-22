@@ -21,12 +21,12 @@ jobs:
         shell: bash
         run: |
           # Extract the YAML portion of the issue body
-          yaml_content=$(awk '/```yaml/{flag=1; next}/```/{flag=0}flag' <<< "${{ github.event.issue.body }}")
+          yaml_content=$(awk '/<!--/{in_comment=!in_comment}/```yaml/{if (in_comment) print; flag=1; next}/```/{flag=0}flag' <<< "${{ github.event.issue.body }}")
           
-          # Extract values from the YAML content using jq
-          process_name=$(echo "${yaml_content}" | jq -r '.process_name')
-          process_version=$(echo "${yaml_content}" | jq -r '.process_version')
-          change_reason=$(echo "${yaml_content}" | jq -r '.change_reason')
+          # Extract values from the YAML content using awk
+          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${yaml_content}")
+          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${yaml_content}")
+          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${yaml_content}")
 
           echo "Process Name: $process_name"
           echo "Process Version: $process_version"
