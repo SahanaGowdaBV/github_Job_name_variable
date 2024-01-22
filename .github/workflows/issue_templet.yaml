@@ -20,9 +20,13 @@ jobs:
       - name: Extract issue details
         shell: bash
         run: |
-          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          process_name=$(yq e '.process_name' <<< "${{ github.event.issue.body }}")
+          process_version=$(yq e '.process_version' <<< "${{ github.event.issue.body }}")
+          change_reason=$(yq e '.change_reason' <<< "${{ github.event.issue.body }}")
+
+          # process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          # process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          # change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${{ github.event.issue.body }}")
           echo "Process Name: $process_name"
           echo "Process Version: $process_version"
           echo "Change Reason: $change_reason"
