@@ -1,0 +1,52 @@
+name: uipath-upload-download
+
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  uipath-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout repository content
+        uses: actions/checkout@v3
+        # with:
+        #   ref: ${{ github.head_ref }}
+        #   # full git history is needed to get a proper list of changed files.
+        #   fetch-depth: 0
+
+      # Setup python
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # - name: Check issue title
+      #   if: ${{ github.event.issue.title == 'Issue: Production package move request' }}
+      #   run: echo "Issue title matches"
+
+      - name: Extract issue details
+        # if: ${{ github.event.issue.title == 'Issue: Production package move request' }}
+        run: |
+          echo "process_name=$(grep 'process_name:' <<< ${{ github.event.issue.body }} | awk '{print $2}')" >> $GITHUB_ENV
+          echo "process_version=$(grep 'process_version:' <<< ${{ github.event.issue.body }} | awk '{print $2}')" >> $GITHUB_ENV
+          echo "change_reason=$(grep 'change_reason:' <<< ${{ github.event.issue.body }} | awk '{print $2}')" >> $GITHUB_ENV
+
+      - name: Download & upload package
+        shell: bash
+        run: |
+          echo "PROCESS_NAME: $PROCESS_NAME"
+          echo "PROCESS_VERSION: $PROCESS_VERSION"
+          echo "CHANGE_REASON: $CHANGE_REASON"
+          # pip3 install requests
+          # python upload-download-package.py "${{ inputs.package-and-version }}"
+        env:
+          # DEV_CLIENT_ID: ${{ secrets.DEV_CLIENT_ID }} 
+          # DEV_CLIENT_SECRET: ${{ secrets.DEV_CLIENT_SECRET }} 
+          # TEST_CLIENT_ID: ${{ secrets.TEST_CLIENT_ID }} 
+          # TEST_CLIENT_SECRET: ${{ secrets.TEST_CLIENT_SECRET }}
+          PROCESS_NAME: ${{ env.process_name }}
+          PROCESS_VERSION: ${{ env.process_version }}
+          CHANGE_REASON: ${{ env.change_reason }}
