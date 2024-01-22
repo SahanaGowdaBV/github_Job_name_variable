@@ -18,6 +18,7 @@ jobs:
         #   fetch-depth: 0
         
       - name: Extract issue details
+        shell: bash
         run: |
           process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
           process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
