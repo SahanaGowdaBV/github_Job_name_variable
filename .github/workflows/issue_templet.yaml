@@ -20,9 +20,12 @@ jobs:
       - name: Extract issue details
         shell: bash
         run: |
-          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "${{ github.event.issue.body }}")
-          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "${{ github.event.issue.body }}")
+          process_name=$(awk -F ': ' '/process_name:/ {print $2}' <<< "$(echo '<!-- Note: This request will move an approved package from DEV to PROD, remove the <> signs and modify the fields below --->')")
+          
+          process_version=$(awk -F ': ' '/process_version:/ {print $2}' <<< "$(echo '<!-- Note: This request will move an approved package from DEV to PROD, remove the <> signs and modify the fields below --->')")
+          
+          change_reason=$(awk -F ': ' '/change_reason:/ {print $2}' <<< "$(echo '<!-- Note: This request will move an approved package from DEV to PROD, remove the <> signs and modify the fields below --->')")
+
 
           echo "Process Name: $process_name"
           echo "Process Version: $process_version"
