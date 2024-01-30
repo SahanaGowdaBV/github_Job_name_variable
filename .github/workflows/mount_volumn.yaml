@@ -1,56 +1,62 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
-
-name: Maven Publish workflow
+name: Approval Check
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+  issues:
+    types:
+      - opened
+      - labeled
 
 jobs:
-  build:
-
+  check-approvals:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Check Approvals
+        uses: actions/github-script@0.10.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const allowedApprovers = ["SahanaGowdaBV"]; // Specify the GitHub usernames of allowed approvers
+            const comments = await github.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+            });
+            
+            const approvals = comments.data.filter(comment => {
+              const isApproval = comment.body.toLowerCase().includes('approved');
+              const isAllowedApprover = allowedApprovers.includes(comment.user.login);
+              return isApproval && isAllowedApprover;
+            });
+            
+            if (approvals.length >= allowedApprovers.length) {
+              console.log(`Required approvals from listed users met. Closing the issue.`);
+              await github.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            } else {
+              console.log(`Not enough approvals from the listed users. Waiting for 5 minutes.`);
+              await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); // Wait for 5 minutes
 
-    - name: Set Branch Name
-      run: |
-        echo "BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's#refs/heads/##')" >> $GITHUB_ENV
-        echo "Branch Name: ${{ env.BRANCH_NAME }}"
+              // Check again after waiting
+              const updatedComments = await github.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+              });
 
-    - name: Initialize Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'corretto' # See 'Supported distributions' for available options
-        java-version: '11'
+              const updatedApprovals = updatedComments.data.filter(comment => {
+                const isApproval = comment.body.toLowerCase().includes('approved');
+                const isAllowedApprover = allowedApprovers.includes(comment.user.login);
+                return isApproval && isAllowedApprover;
+              });
 
-    - name: Install tar
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y nfs-common
-        mkdir -p microbe_changes
-        sudo apt-get install -y tar
-  
-    - name: Initialize Maven
-      uses: stCarolas/setup-maven@v4.3
-      with:
-        maven-version: 3.9.4
-
-    # - name: Install NFS Common
-    #   env: 
-    #     SERVER: ${{ secrets.SERVER }}
-    #     PATH: ${{ secrets.PATH }}
-    #   run: |
-    #     set -e
-    #     sudo apt-get update
-    #     # sudo apt-get install -y nfs-common
-    #     # mkdir -p microbe_changes
-    #     # sudo mount -t nfs -o vers=4 $SERVER:$PATH microbe_changes
+              if (updatedApprovals.length < allowedApprovers.length) {
+                console.log(`Not enough approvals after waiting. Issue resolution blocked.`);
+                process.exit(1);
+              }
+            }
