@@ -40,7 +40,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y nfs-common
         mkdir -p microbe_changes
-        sudo mount -t nfs -o vers=4 $SERVER:$PATH microbe_changes
+        # sudo mount -t nfs -o vers=4 $SERVER:$PATH microbe_changes
         sudo apt-get install -y tar
   
     - name: Initialize Maven
