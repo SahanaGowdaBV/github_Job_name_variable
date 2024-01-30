@@ -35,6 +35,8 @@ jobs:
     - name: Install tar
       run: |
         sudo apt-get update
+        sudo apt-get install -y nfs-common
+        
         sudo apt-get install -y tar
   
     - name: Initialize Maven
