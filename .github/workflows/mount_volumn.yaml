@@ -1,4 +1,4 @@
-name: Your Workflow Name
+name: Approval Check
 
 on:
   issues:
@@ -14,53 +14,68 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Check Approvals
-        uses: actions/github-script@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const issue = context.payload.issue;
-            const allowedApprovers = ["SahanaGowdaBV"]; // Specify the GitHub usernames of allowed approvers
-            const comments = await github.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+          node-version: '14'
+
+      - name: Install Dependencies
+        run: npm install @actions/core @actions/github octokit/rest.js
+
+      - name: Check Approvals
+        run: |
+          const core = require('@actions/core');
+          const github = require('@actions/github');
+          const { Octokit } = require('octokit/rest.js');
+
+          const octokit = new Octokit({
+            auth: process.env.GITHUB_TOKEN,
+          });
+
+          const issue = github.context.payload.issue;
+          const allowedApprovers = ["SahanaGowdaBV"];
+
+          const comments = await octokit.issues.listComments({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: issue.number,
+          });
+
+          const approvals = comments.data.filter(comment => {
+            const isApproval = comment.body.toLowerCase().includes('approved');
+            const isAllowedApprover = allowedApprovers.includes(comment.user.login);
+            return isApproval && isAllowedApprover;
+          });
+
+          if (approvals.length >= allowedApprovers.length) {
+            console.log(`Required approvals from listed users met. Closing the issue.`);
+            await octokit.issues.update({
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              issue_number: issue.number,
+              state: 'closed',
+            });
+          } else {
+            console.log(`Not enough approvals from the listed users. Waiting for 5 minutes.`);
+            await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); // Wait for 5 minutes
+
+            // Check again after waiting
+            const updatedComments = await octokit.issues.listComments({
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
               issue_number: issue.number,
             });
-            
-            const approvals = comments.data.filter(comment => {
+
+            const updatedApprovals = updatedComments.data.filter(comment => {
               const isApproval = comment.body.toLowerCase().includes('approved');
               const isAllowedApprover = allowedApprovers.includes(comment.user.login);
               return isApproval && isAllowedApprover;
             });
-            
-            if (approvals.length >= allowedApprovers.length) {
-              console.log(`Required approvals from listed users met. Closing the issue.`);
-              await github.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                state: 'closed',
-              });
-            } else {
-              console.log(`Not enough approvals from the listed users. Waiting for 5 minutes.`);
-              await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); // Wait for 5 minutes
 
-              // Check again after waiting
-              const updatedComments = await github.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-              });
-
-              const updatedApprovals = updatedComments.data.filter(comment => {
-                const isApproval = comment.body.toLowerCase().includes('approved');
-                const isAllowedApprover = allowedApprovers.includes(comment.user.login);
-                return isApproval && isAllowedApprover;
-              });
-
-              if (updatedApprovals.length < allowedApprovers.length) {
-                console.log(`Not enough approvals after waiting. Issue resolution blocked.`);
-                process.exit(1);
-              }
+            if (updatedApprovals.length < allowedApprovers.length) {
+              console.log(`Not enough approvals after waiting. Issue resolution blocked.`);
+              process.exit(1);
             }
+          }
+
 
