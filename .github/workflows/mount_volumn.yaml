@@ -1,4 +1,4 @@
-name: Approval Check
+name: Your Workflow Name
 
 on:
   issues:
@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
       - name: Check Approvals
         uses: actions/github-script@v3
         with:
@@ -60,3 +63,4 @@ jobs:
                 process.exit(1);
               }
             }
+
