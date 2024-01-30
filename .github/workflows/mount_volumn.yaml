@@ -41,12 +41,12 @@ jobs:
       with:
         maven-version: 3.9.4
 
-    # - name: Install NFS Common
-    #   env: 
-    #     SERVER: ${{ secrets.SERVER }}
-    #     PATH: ${{ secrets.PATH }}
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y nfs-common
-    #     mkdir -p microbe_changes
-    #     sudo mount -t nfs -o vers=4 $SERVER:$PATH microbe_changes
+    - name: Install NFS Common
+      env: 
+        SERVER: ${{ secrets.SERVER }}
+        PATH: ${{ secrets.PATH }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y nfs-common
+        mkdir -p microbe_changes
+        sudo mount -t nfs -o vers=4 $SERVER:$PATH microbe_changes
