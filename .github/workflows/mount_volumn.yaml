@@ -32,14 +32,14 @@ jobs:
         distribution: 'corretto' # See 'Supported distributions' for available options
         java-version: '11'
 
-    - name: Install tar
-      run: |
-        sudo apt-get install -y tar
+    # - name: Install tar
+    #   run: |
+    #     sudo apt-get install -y tar
   
-    - name: Initialize Maven
-      uses: stCarolas/setup-maven@v4.3
-      with:
-        maven-version: 3.9.4
+    # - name: Initialize Maven
+    #   uses: stCarolas/setup-maven@v4.3
+    #   with:
+    #     maven-version: 3.9.4
 
     - name: Install NFS Common
       env: 
