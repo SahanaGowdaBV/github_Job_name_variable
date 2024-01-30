@@ -26,28 +26,29 @@ jobs:
         echo "BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's#refs/heads/##')" >> $GITHUB_ENV
         echo "Branch Name: ${{ env.BRANCH_NAME }}"
 
-    # - name: Initialize Java
-    #   uses: actions/setup-java@v3
-    #   with:
-    #     distribution: 'corretto' # See 'Supported distributions' for available options
-    #     java-version: '11'
+    - name: Initialize Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'corretto' # See 'Supported distributions' for available options
+        java-version: '11'
 
-    # - name: Install tar
-    #   run: |
-    #     sudo apt-get install -y tar
-  
-    # - name: Initialize Maven
-    #   uses: stCarolas/setup-maven@v4.3
-    #   with:
-    #     maven-version: 3.9.4
-
-    - name: Install NFS Common
-      env: 
-        SERVER: ${{ secrets.SERVER }}
-        PATH: ${{ secrets.PATH }}
+    - name: Install tar
       run: |
-        set -e
         sudo apt-get update
-        # sudo apt-get install -y nfs-common
-        # mkdir -p microbe_changes
-        # sudo mount -t nfs -o vers=4 $SERVER:$PATH microbe_changes
+        sudo apt-get install -y tar
+  
+    - name: Initialize Maven
+      uses: stCarolas/setup-maven@v4.3
+      with:
+        maven-version: 3.9.4
+
+    # - name: Install NFS Common
+    #   env: 
+    #     SERVER: ${{ secrets.SERVER }}
+    #     PATH: ${{ secrets.PATH }}
+    #   run: |
+    #     set -e
+    #     sudo apt-get update
+    #     # sudo apt-get install -y nfs-common
+    #     # mkdir -p microbe_changes
+    #     # sudo mount -t nfs -o vers=4 $SERVER:$PATH microbe_changes
